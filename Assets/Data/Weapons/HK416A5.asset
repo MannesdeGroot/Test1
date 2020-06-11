@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b17419f055f39fd4cb3dbd2502c37c70, type: 3}
+  m_Name: HK416A5
+  m_EditorClassIdentifier: 
+  canToggle: 1
+  fireMode: 0
+  projectile: {fileID: 362959287928485307, guid: 44ed0c906152da449aa0c34ae8d09490,
+    type: 3}
+  clipSize: 30
+  muzzleVelocity: 730
+  fireRate: 850
