@@ -111,15 +111,17 @@ public class InfantryController : MonoBehaviour
 
     private void Fire()
     {
+        if (Input.GetButtonDown("Fire3")) weapon.ToggleFireMode();
+
         fireTimer -= Time.deltaTime;
         if (fireTimer > 0) return;
 
-        if (weapon.weaponInfo.fireMode == WeaponStats.mode.SEMI_AUTO)
+        if (weapon.fireMode == FireMode.SEMI_AUTO)
         {
             if (Input.GetButtonDown("Fire1"))
             {
                 weapon.Fire();
-                fireTimer = weapon.weaponInfo.fireRate / 3600f;
+                fireTimer = weapon.weaponInfo.roundsPerMinute / 3600f;
                 print(fireTimer);
             }
         }
@@ -128,7 +130,7 @@ public class InfantryController : MonoBehaviour
             if (Input.GetButton("Fire1"))
             {
                 weapon.Fire();
-                fireTimer = weapon.weaponInfo.fireRate / 60f;
+                fireTimer = weapon.weaponInfo.roundsPerMinute / 3600f;
                 print(fireTimer);
             }
         }
