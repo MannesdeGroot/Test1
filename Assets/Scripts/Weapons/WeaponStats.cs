@@ -7,8 +7,7 @@ public class WeaponStats : ScriptableObject
 {
     [Header("Fire Mode")]
     public bool canToggle;
-    public enum mode { SEMI_AUTO, FULL_AUTO }
-    public mode fireMode = mode.SEMI_AUTO;
+    public FireMode fireMode = FireMode.SEMI_AUTO;
 
     [Header("Bullet Info")]
     public GameObject projectile;
@@ -16,5 +15,5 @@ public class WeaponStats : ScriptableObject
 
     [Header("Firing")]
     public float muzzleVelocity;
-    public float fireRate;
+    public float roundsPerMinute;
 }
