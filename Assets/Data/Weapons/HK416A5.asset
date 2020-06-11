@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: HK416A5
   m_EditorClassIdentifier: 
   canToggle: 1
-  fireMode: 0
+  fireMode: 1
   projectile: {fileID: 362959287928485307, guid: 44ed0c906152da449aa0c34ae8d09490,
     type: 3}
   clipSize: 30
   muzzleVelocity: 730
-  fireRate: 850
+  roundsPerMinute: 850
