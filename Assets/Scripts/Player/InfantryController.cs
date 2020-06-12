@@ -84,12 +84,12 @@ public class InfantryController : MonoBehaviour
 
             if (freeLook)
             {
-                print("a");
+                //print("a");
                 if (eyes.rotation != currentWeapon.transform.rotation)
                 {
-                    print("b");
+                    //print("b");
                     eyes.rotation = Quaternion.Lerp(eyes.rotation, currentWeapon.transform.rotation, snapBackSpeed * Time.deltaTime);
-                    print($"{eyes.rotation},{currentWeapon.transform.rotation}");
+                    //print($"{eyes.rotation},{currentWeapon.transform.rotation}");
                     return;
                 }
                 else freeLook = false;
@@ -122,7 +122,6 @@ public class InfantryController : MonoBehaviour
             {
                 weapon.Fire();
                 fireTimer = weapon.weaponInfo.roundsPerMinute / 3600f;
-                print(fireTimer);
             }
         }
         else
@@ -131,7 +130,6 @@ public class InfantryController : MonoBehaviour
             {
                 weapon.Fire();
                 fireTimer = weapon.weaponInfo.roundsPerMinute / 3600f;
-                print(fireTimer);
             }
         }
     }

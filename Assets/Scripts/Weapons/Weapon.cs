@@ -15,14 +15,8 @@ public class Weapon : MonoBehaviour
 
     public void Fire()
     {
-        GameObject projectile = Instantiate(weaponInfo.projectile, launchPosition.position, launchPosition.rotation);
-        projectile.GetComponent<Rigidbody>().AddForce(launchPosition.forward * weaponInfo.muzzleVelocity);
-
-        if(Physics.Raycast(launchPosition.position, launchPosition.forward, out RaycastHit hit))
-        {
-            Debug.DrawRay(launchPosition.position, launchPosition.forward * 100, Color.red, 5f);
-            print(hit.transform.name);
-        }
+        GameObject projectile = Instantiate(weaponInfo.projectile, launchPosition.position, transform.rotation);
+        projectile.GetComponent<Rigidbody>().AddForce(projectile.transform.forward * weaponInfo.muzzleVelocity);
     }
 
     public void Reload()
@@ -44,6 +38,5 @@ public class Weapon : MonoBehaviour
                     break;
             }
         }
-        print(fireMode);
     }
 }
