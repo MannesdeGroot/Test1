@@ -37,21 +37,6 @@ public class Bullet : MonoBehaviour
             rb.velocity *= 0;
             Penetrate();
         }
-
-        Debug.DrawRay(transform.position, transform.forward * 0.5f, Color.blue, 0.5f);
-
-        traceTimer -= Time.deltaTime;
-        if (traceTimer < 0)
-        {
-            traceTimer = traceCountdown;
-            bulletPath.Add(transform.position);
-        }
-
-        if (bulletPath.Count < 2) return;
-        for (int i = 0; i < bulletPath.Count - 1; i++)
-        {
-            Debug.DrawLine(bulletPath[i], bulletPath[i + 1], Color.red, 100);
-        }
     }
 
     private void Penetrate()
@@ -99,5 +84,20 @@ public class Bullet : MonoBehaviour
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawSphere(transform.position + transform.forward * PenetrationDepth(), 0.02f);
+
+        Debug.DrawRay(transform.position, transform.forward * 0.5f, Color.blue, 0.5f);
+
+        traceTimer -= Time.deltaTime;
+        if (traceTimer < 0)
+        {
+            traceTimer = traceCountdown;
+            bulletPath.Add(transform.position);
+        }
+
+        if (bulletPath.Count < 2) return;
+        for (int i = 0; i < bulletPath.Count - 1; i++)
+        {
+            Debug.DrawLine(bulletPath[i], bulletPath[i + 1], Color.red, 100);
+        }
     }
 }
