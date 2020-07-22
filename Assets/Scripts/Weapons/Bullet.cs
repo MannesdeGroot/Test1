@@ -4,100 +4,111 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public enum Caliber { SMALL, MEDIUM, HIGH }
-    public Caliber caliber = Caliber.HIGH;
-    [SerializeField] private float penetrationMultiplier;
+    [SerializeField] private Caliber caliber;
+    private AudioSource audioSource;
     private Rigidbody rb;
-    private bool penetrated;
+    private bool penetrated = true;
+    private float startVelocity;
     private float velocityOnHit;
+    private float distancePenetrated;
 
     private float traceCountdown = 0.5f;
     private float traceTimer;
     private List<Vector3> bulletPath = new List<Vector3>();
 
-    /*
-     * TODO:
-     * - Calculate Velocity after penetration.
-     * - Penetration Multiplier tweaking.
-     */
-
     private void Start()
     {
+        bulletPath.Add(transform.position);
         rb = GetComponent<Rigidbody>();
-        penetrated = true;
-        rb.velocity = new Vector3(rb.velocity.z, rb.velocity.y, rb.velocity.x);
+        audioSource = GetComponent<AudioSource>();
+        audioSource.clip = caliber.clip;
+        audioSource.Play();
     }
 
     private void Update()
     {
+        if(startVelocity == 0)
+            startVelocity = Mathf.Abs((transform.rotation * rb.velocity).x);
+
+        CheckForWall();
+
+        if (rb.velocity != Vector3.zero)
+        {
+            traceTimer -= Time.deltaTime * 5;
+            if (traceTimer < 0)
+            {
+                traceTimer = traceCountdown;
+                bulletPath.Add(transform.position);
+            }
+
+            if (bulletPath.Count < 2) return;
+            for (int i = 0; i < bulletPath.Count - 1; i++)
+            {
+                Debug.DrawLine(bulletPath[i], bulletPath[i + 1], Color.red, 100);
+            }
+        }
+        else if (!bulletPath.Contains(transform.position))
+            bulletPath.Add(transform.position);
+    }
+
+    void CheckForWall()
+    {
         if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 0.02f) && penetrated)
         {
             penetrated = false;
-            velocityOnHit = (transform.rotation * rb.velocity).x;
+            velocityOnHit = Mathf.Abs((transform.rotation * rb.velocity).x);
             rb.velocity *= 0;
-            Penetrate();
+            Penetrate(hit.collider);
         }
     }
 
-    private void Penetrate()
+    private void Penetrate(Collider col)
     {
-        //print(PenetrationDepth());
-        if (!Physics.CheckSphere(transform.position + transform.forward * PenetrationDepth(), 0.01f))
+        Penetratable otherObject = col.GetComponent<Penetratable>();
+
+        if (otherObject != null)
         {
-            rb.useGravity = false;
-            transform.position += transform.forward * PenetrationDepth();
-            penetrated = true;
+            float normalizedVelocity = velocityOnHit / startVelocity;
 
-            if (Physics.Raycast(transform.position, -transform.forward, out RaycastHit hit))
+            if (!Physics.CheckSphere(transform.position + transform.forward * PenetrationDepth(otherObject.density, normalizedVelocity), 0.01f))
             {
-                transform.position = hit.point;
-                rb.velocity = transform.forward * CalculateVelocity();
+                Vector3 penetratePos = transform.position + transform.forward * PenetrationDepth(otherObject.density, normalizedVelocity);
+
+                if (col.Raycast(new Ray(penetratePos, -transform.forward), out RaycastHit hit, Mathf.Infinity))
+                {
+                    penetrated = true;
+                    distancePenetrated = Vector3.Distance(transform.position, hit.point);
+                    transform.position = hit.point;
+                    rb.velocity = transform.forward * CalculateVelocity();
+                }
             }
+            else
+                rb.useGravity = false;
         }
     }
 
-    private float PenetrationDepth()
+    private float PenetrationDepth(float density, float normalizedVelocity)
     {
-        return penetrationMultiplier * velocityOnHit * CaliberMultiplier();
+        return caliber.length * (caliber.density / density) * normalizedVelocity;
     }
 
     private float CalculateVelocity()
     {
-        return 100;
+        return velocityOnHit - velocityOnHit * (caliber.mass / distancePenetrated);
     }
 
-    private float CaliberMultiplier()
+    private void OnCollisionEnter(Collision c)
     {
-        switch (caliber)
+        bulletPath.Add(transform.position);
+        CheckForWall();
+
+        Health health = c.transform.GetComponent<Health>();
+        if (health != null)
         {
-            case Caliber.HIGH:
-                return 1.5f;
-            case Caliber.MEDIUM:
-                return 1f;
-            case Caliber.SMALL:
-                return 0.5f;
-        }
-        return 0;
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawSphere(transform.position + transform.forward * PenetrationDepth(), 0.02f);
-
-        Debug.DrawRay(transform.position, transform.forward * 0.5f, Color.blue, 0.5f);
-
-        traceTimer -= Time.deltaTime;
-        if (traceTimer < 0)
-        {
-            traceTimer = traceCountdown;
-            bulletPath.Add(transform.position);
+            health.ChangeHealth(0);
         }
 
-        if (bulletPath.Count < 2) return;
-        for (int i = 0; i < bulletPath.Count - 1; i++)
-        {
-            Debug.DrawLine(bulletPath[i], bulletPath[i + 1], Color.red, 100);
-        }
+        bulletPath.Add(transform.position);
+        //Destroy(gameObject);
     }
 }

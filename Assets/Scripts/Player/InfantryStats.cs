@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu]
+[CreateAssetMenu(fileName = "Infantry", menuName = "Controllers/Infantry")]
 public class InfantryStats : ScriptableObject
 {
     [Header("Movement")]

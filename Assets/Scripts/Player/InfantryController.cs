@@ -13,8 +13,9 @@ public class InfantryController : MonoBehaviour
     [SerializeField] private float lookUpClamp, lookSideClamp;
     [SerializeField] private float normalFov, runFov;
     [SerializeField] private float fovChangeSpeed;
-    private Vector3 eyeRot, headRot, bodyRot;
-    private bool freeLook;
+    public Vector3 eyeRot, headRot, bodyRot;
+    public float verticalInput;
+    public bool freeLook;
 
     [Header("Weapons")]
     public Transform gunPos;
@@ -31,9 +32,13 @@ public class InfantryController : MonoBehaviour
     private void Update()
     {
         Move();
-        Look();
         Fire();
+        Look();
         Aim();
+    }
+
+    private void FixedUpdate()
+    {
     }
 
     private void Move()
@@ -57,47 +62,50 @@ public class InfantryController : MonoBehaviour
 
     private void Look()
     {
-        eyeRot.x -= Input.GetAxis("Mouse Y") * Time.deltaTime * Settings.sensitivity;
+        verticalInput = Input.GetAxis("Mouse Y") * Time.deltaTime * Settings.sensitivity;
+        eyeRot.x -= verticalInput;
         eyeRot.x = Mathf.Clamp(eyeRot.x, -lookUpClamp, lookUpClamp);
-        eyes.localRotation = Quaternion.Euler(eyeRot);
 
         if (Input.GetButtonDown("Left Alt"))
+        {
             headRot = new Vector3(0, bodyRot.y, 0);
+            freeLook = true;
+        }
 
         if (Input.GetButton("Left Alt"))
         {
             headRot.y += Input.GetAxis("Mouse X") * Time.deltaTime * Settings.sensitivity;
             headRot.y = Mathf.Clamp(headRot.y, bodyRot.y - lookSideClamp, bodyRot.y + lookSideClamp);
             head.rotation = Quaternion.Euler(headRot);
-            freeLook = true;
+            eyes.localRotation = Quaternion.Euler(eyeRot);
         }
         else
         {
             bodyRot.y += Input.GetAxis("Mouse X") * Time.deltaTime * Settings.sensitivity;
             transform.rotation = Quaternion.Euler(bodyRot);
-
             if (head.rotation.y != transform.rotation.y)
             {
                 head.rotation = Quaternion.Lerp(head.rotation, transform.rotation, snapBackSpeed * Time.deltaTime);
-                return;
             }
 
             if (freeLook)
             {
-                //print("a");
                 if (eyes.rotation != currentWeapon.transform.rotation)
                 {
-                    //print("b");
-                    eyes.rotation = Quaternion.Lerp(eyes.rotation, currentWeapon.transform.rotation, snapBackSpeed * Time.deltaTime);
-                    //print($"{eyes.rotation},{currentWeapon.transform.rotation}");
-                    return;
+                    eyeRot = Quaternion.Lerp(eyes.rotation, currentWeapon.transform.rotation, snapBackSpeed * Time.deltaTime).eulerAngles;
+                    eyes.rotation = Quaternion.Euler(eyeRot);
                 }
-                else freeLook = false;
+                else
+                {
+                    verticalInput = 0;
+                    freeLook = false;
+                }
             }
             else
             {
                 currentWeapon.transform.position = gunPos.position;
                 currentWeapon.transform.rotation = gunPos.rotation;
+                eyes.localRotation = Quaternion.Euler(eyeRot);
             }
         }
     }
@@ -121,7 +129,7 @@ public class InfantryController : MonoBehaviour
             if (Input.GetButtonDown("Fire1"))
             {
                 weapon.Fire();
-                fireTimer = weapon.weaponInfo.roundsPerMinute / 3600f;
+                fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
             }
         }
         else
@@ -129,7 +137,7 @@ public class InfantryController : MonoBehaviour
             if (Input.GetButton("Fire1"))
             {
                 weapon.Fire();
-                fireTimer = weapon.weaponInfo.roundsPerMinute / 3600f;
+                fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
             }
         }
     }

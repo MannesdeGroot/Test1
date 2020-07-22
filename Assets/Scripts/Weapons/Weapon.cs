@@ -16,7 +16,7 @@ public class Weapon : MonoBehaviour
     public void Fire()
     {
         GameObject projectile = Instantiate(weaponInfo.projectile, launchPosition.position, transform.rotation);
-        projectile.GetComponent<Rigidbody>().AddForce(projectile.transform.forward * weaponInfo.muzzleVelocity);
+        projectile.GetComponent<Rigidbody>().AddForce(launchPosition.forward * weaponInfo.muzzleVelocity);
     }
 
     public void Reload()

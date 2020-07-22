@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-[CreateAssetMenu]
+[CreateAssetMenu(fileName = "Weapon", menuName = "Weapons/Weapon")]
 public class WeaponStats : ScriptableObject
 {
     [Header("Fire Mode")]
