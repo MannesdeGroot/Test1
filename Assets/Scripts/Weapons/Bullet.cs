@@ -5,7 +5,6 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [SerializeField] private Caliber caliber;
-    private AudioSource audioSource;
     private Rigidbody rb;
     private bool penetrated = true;
     private float startVelocity;
@@ -20,9 +19,6 @@ public class Bullet : MonoBehaviour
     {
         bulletPath.Add(transform.position);
         rb = GetComponent<Rigidbody>();
-        audioSource = GetComponent<AudioSource>();
-        audioSource.clip = caliber.clip;
-        audioSource.Play();
     }
 
     private void Update()

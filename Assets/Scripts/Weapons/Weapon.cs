@@ -6,6 +6,7 @@ public class Weapon : MonoBehaviour
 {
     public WeaponStats weaponInfo;
     public GameObject muzzleFlash;
+    public AudioClip shot;
     public FireMode fireMode;
     [SerializeField] private Transform launchPosition;
     private int ammo;
@@ -23,7 +24,11 @@ public class Weapon : MonoBehaviour
         if (ammo > 0 && !reloading)
         {
             GameObject flash = Instantiate(muzzleFlash, launchPosition.position, transform.rotation);
+            AudioSource audioSource = flash.GetComponent<AudioSource>();
+            audioSource.clip = shot;
+            audioSource.Play();
             Destroy(flash, 3);
+
             GameObject projectile = Instantiate(weaponInfo.projectile, launchPosition.position, transform.rotation);
             projectile.GetComponent<Rigidbody>().AddForce(launchPosition.forward * weaponInfo.muzzleVelocity);
             ammo--;
