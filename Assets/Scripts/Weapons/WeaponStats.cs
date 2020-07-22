@@ -10,6 +10,7 @@ public class WeaponStats : ScriptableObject
     [Header("Bullet Info")]
     public GameObject projectile;
     public int clipSize;
+    public float reloadTime;
 
     [Header("Firing")]
     public float muzzleVelocity;

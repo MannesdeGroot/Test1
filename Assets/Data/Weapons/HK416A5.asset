@@ -17,5 +17,6 @@ MonoBehaviour:
   projectile: {fileID: 362959287928485307, guid: 44ed0c906152da449aa0c34ae8d09490,
     type: 3}
   clipSize: 30
+  reloadTime: 1
   muzzleVelocity: 730
   roundsPerMinute: 850

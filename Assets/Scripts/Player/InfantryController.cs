@@ -35,10 +35,7 @@ public class InfantryController : MonoBehaviour
         Fire();
         Look();
         Aim();
-    }
-
-    private void FixedUpdate()
-    {
+        Reload();
     }
 
     private void Move()
@@ -140,6 +137,12 @@ public class InfantryController : MonoBehaviour
                 fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
             }
         }
+    }
+
+    private void Reload()
+    {
+        if (Input.GetButtonDown("Reload"))
+            StartCoroutine(weapon.Reload());
     }
 
     private void Aim()

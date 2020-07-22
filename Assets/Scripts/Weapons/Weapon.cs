@@ -5,23 +5,45 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     public WeaponStats weaponInfo;
+    public GameObject muzzleFlash;
     public FireMode fireMode;
     [SerializeField] private Transform launchPosition;
+    private int ammo;
+    private bool reloading;
 
     private void Start()
     {
+        ammo = weaponInfo.clipSize;
         fireMode = weaponInfo.fireMode;
+        HUD.SetAmmoText(ammo, weaponInfo.clipSize);
     }
 
     public void Fire()
     {
-        GameObject projectile = Instantiate(weaponInfo.projectile, launchPosition.position, transform.rotation);
-        projectile.GetComponent<Rigidbody>().AddForce(launchPosition.forward * weaponInfo.muzzleVelocity);
+        if (ammo > 0 && !reloading)
+        {
+            GameObject flash = Instantiate(muzzleFlash, launchPosition.position, transform.rotation);
+            Destroy(flash, 3);
+            GameObject projectile = Instantiate(weaponInfo.projectile, launchPosition.position, transform.rotation);
+            projectile.GetComponent<Rigidbody>().AddForce(launchPosition.forward * weaponInfo.muzzleVelocity);
+            ammo--;
+            HUD.SetAmmoText(ammo, weaponInfo.clipSize);
+        }
     }
 
-    public void Reload()
+    public IEnumerator Reload()
     {
+        if (!reloading)
+        {
+            reloading = true;
+            //Play anim, sound
 
+            yield return new WaitForSeconds(weaponInfo.reloadTime);
+
+            ammo = weaponInfo.clipSize;
+            HUD.SetAmmoText(ammo, weaponInfo.clipSize);
+            reloading = false;
+        }
     }
 
     public void ToggleFireMode()

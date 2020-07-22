@@ -15,3 +15,4 @@ MonoBehaviour:
   mass: 0.04
   length: 5.56
   density: 11.342
+  clip: {fileID: 8300000, guid: 38b450e2adcb6f542acc8c1d423bd8dc, type: 3}
