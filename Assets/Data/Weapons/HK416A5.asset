@@ -20,3 +20,4 @@ MonoBehaviour:
   reloadTime: 1
   muzzleVelocity: 730
   roundsPerMinute: 850
+  recoilMultiplier: 0.8

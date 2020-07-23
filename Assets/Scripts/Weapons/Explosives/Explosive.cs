@@ -38,7 +38,6 @@ public class Explosive : MonoBehaviour
             if (door != null)
             {
                 door.ExplosionBreach(CalculateExplosionForce(transform.position, door.transform.position), transform.position, explosive.blastRadius, explosive.force);
-                print(CalculateExplosionForce(transform.position, door.transform.position));
             }
         }
 
@@ -51,6 +50,8 @@ public class Explosive : MonoBehaviour
                 rb.AddExplosionForce(explosive.force, transform.position, explosive.blastRadius);
             }
         }
+
+        Destroy(gameObject);
     }
 
     private float CalculateExplosionForce(Vector3 source, Vector3 targetPos)

@@ -15,4 +15,5 @@ public class WeaponStats : ScriptableObject
     [Header("Firing")]
     public float muzzleVelocity;
     public float roundsPerMinute;
+    public float recoilMultiplier;
 }

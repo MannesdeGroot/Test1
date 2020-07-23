@@ -16,6 +16,12 @@ public class InfantryController : MonoBehaviour
     public Vector3 eyeRot, headRot, bodyRot;
     public float verticalInput;
     public bool freeLook;
+    [Space()]
+    [SerializeField] private float recoilRotationSpeed;
+    [SerializeField] private float recoilReturnSpeed;
+    [SerializeField] private Vector3 recoilRotationHipFire;
+    [SerializeField] private Vector3 recoilRotationAiming;
+    private Vector3 recoilRotAmplifier, recoilRot;
 
     [Header("Weapons")]
     public Transform gunPos;
@@ -36,6 +42,7 @@ public class InfantryController : MonoBehaviour
         Look();
         Aim();
         Reload();
+        RecoilRotation();
     }
 
     private void Move()
@@ -126,6 +133,7 @@ public class InfantryController : MonoBehaviour
             if (Input.GetButtonDown("Fire1"))
             {
                 weapon.Fire();
+                Recoil();
                 fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
             }
         }
@@ -134,6 +142,7 @@ public class InfantryController : MonoBehaviour
             if (Input.GetButton("Fire1"))
             {
                 weapon.Fire();
+                Recoil();
                 fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
             }
         }
@@ -148,5 +157,19 @@ public class InfantryController : MonoBehaviour
     private void Aim()
     {
 
+    }
+
+    private void RecoilRotation()
+    {
+        recoilRotAmplifier = Vector3.Lerp(recoilRotAmplifier, eyeRot, recoilReturnSpeed * Time.deltaTime);
+        recoilRot = Vector3.Slerp(recoilRot, recoilRotAmplifier, recoilRotationSpeed * Time.deltaTime);
+        eyes.localRotation = Quaternion.Euler(eyeRot + recoilRotAmplifier);
+    }
+
+    private void Recoil()
+    {
+        float recoilY = Random.Range(-recoilRotationHipFire.y, recoilRotationHipFire.y);
+        float recoilZ = Random.Range(-recoilRotationHipFire.z, recoilRotationHipFire.z);
+        recoilRotAmplifier += new Vector3(-recoilRotationHipFire.x, recoilY, recoilZ) * weapon.weaponInfo.recoilMultiplier;
     }
 }

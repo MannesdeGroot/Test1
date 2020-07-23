@@ -29,8 +29,9 @@ public class Weapon : MonoBehaviour
             audioSource.Play();
             Destroy(flash, 3);
 
-            GameObject projectile = Instantiate(weaponInfo.projectile, launchPosition.position, transform.rotation);
+            GameObject projectile = Instantiate(weaponInfo.projectile, launchPosition.position, launchPosition.rotation);
             projectile.GetComponent<Rigidbody>().AddForce(launchPosition.forward * weaponInfo.muzzleVelocity);
+            projectile.GetComponent<Bullet>().startVelocity = weaponInfo.muzzleVelocity;
             ammo--;
             HUD.SetAmmoText(ammo, weaponInfo.clipSize);
         }

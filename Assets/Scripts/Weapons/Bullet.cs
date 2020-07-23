@@ -7,7 +7,7 @@ public class Bullet : MonoBehaviour
     [SerializeField] private Caliber caliber;
     private Rigidbody rb;
     private bool penetrated = true;
-    private float startVelocity;
+    public float startVelocity;
     private float velocityOnHit;
     private float distancePenetrated;
 
@@ -23,11 +23,6 @@ public class Bullet : MonoBehaviour
 
     private void Update()
     {
-        if(startVelocity == 0)
-            startVelocity = Mathf.Abs((transform.rotation * rb.velocity).x);
-
-        CheckForWall();
-
         if (rb.velocity != Vector3.zero)
         {
             traceTimer -= Time.deltaTime * 5;
@@ -43,13 +38,16 @@ public class Bullet : MonoBehaviour
                 Debug.DrawLine(bulletPath[i], bulletPath[i + 1], Color.red, 100);
             }
         }
-        else if (!bulletPath.Contains(transform.position))
-            bulletPath.Add(transform.position);
+        else
+        {
+            if (!bulletPath.Contains(transform.position))
+                bulletPath.Add(transform.position);
+        }
     }
 
     void CheckForWall()
     {
-        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 0.02f) && penetrated)
+        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 0.1f) && penetrated)
         {
             penetrated = false;
             velocityOnHit = Mathf.Abs((transform.rotation * rb.velocity).x);
@@ -66,9 +64,9 @@ public class Bullet : MonoBehaviour
         {
             float normalizedVelocity = velocityOnHit / startVelocity;
 
-            if (!Physics.CheckSphere(transform.position + transform.forward * PenetrationDepth(otherObject.density, normalizedVelocity), 0.01f))
+            if (!Physics.CheckSphere(transform.position + transform.forward * PenetrationDepth(otherObject.density, normalizedVelocity, col), 0.01f))
             {
-                Vector3 penetratePos = transform.position + transform.forward * PenetrationDepth(otherObject.density, normalizedVelocity);
+                Vector3 penetratePos = transform.position + transform.forward * PenetrationDepth(otherObject.density, normalizedVelocity, col);
 
                 if (col.Raycast(new Ray(penetratePos, -transform.forward), out RaycastHit hit, Mathf.Infinity))
                 {
@@ -79,13 +77,23 @@ public class Bullet : MonoBehaviour
                 }
             }
             else
-                rb.useGravity = false;
+                Destroy(gameObject);
         }
     }
 
-    private float PenetrationDepth(float density, float normalizedVelocity)
+    private float PenetrationDepth(float density, float normalizedVelocity, Collider collider)
     {
-        return caliber.length * (caliber.density / density) * normalizedVelocity;
+        float initialDepth = caliber.length * (caliber.density / density) * normalizedVelocity * 100;
+        float thickness = 0;
+
+        if (collider.Raycast(new Ray(transform.position + transform.forward * initialDepth, -transform.forward), out RaycastHit hit, initialDepth))
+        {
+            thickness = Vector3.Distance(transform.position, hit.point) * 100;
+        }
+
+        float depth = initialDepth / Mathf.Pow(thickness, 2);
+        print($"{initialDepth} / {Mathf.Pow(thickness, 2)} = {depth}");
+        return depth;
     }
 
     private float CalculateVelocity()
@@ -105,6 +113,5 @@ public class Bullet : MonoBehaviour
         }
 
         bulletPath.Add(transform.position);
-        //Destroy(gameObject);
     }
 }
