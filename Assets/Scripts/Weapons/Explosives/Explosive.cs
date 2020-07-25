@@ -37,7 +37,7 @@ public class Explosive : MonoBehaviour
             Door door = col.GetComponent<Door>();
             if (door != null)
             {
-                door.ExplosionBreach(CalculateExplosionForce(transform.position, door.transform.position), transform.position, explosive.blastRadius, explosive.force);
+                door.ExplosionBreach(CalculateForce(explosive.blastForce, transform.position, door.transform.position), transform.position, explosive.blastRadius, explosive.blastForce);
             }
         }
 
@@ -47,15 +47,15 @@ public class Explosive : MonoBehaviour
             Rigidbody rb = col.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddExplosionForce(explosive.force, transform.position, explosive.blastRadius);
+                rb.AddExplosionForce(explosive.blastForce, transform.position, explosive.blastRadius);
             }
         }
 
         Destroy(gameObject);
     }
 
-    private float CalculateExplosionForce(Vector3 source, Vector3 targetPos)
+    private float CalculateForce(float value, Vector3 source, Vector3 targetPos)
     {
-        return explosive.force / Vector3.Distance(source, targetPos);
+        return value / Vector3.Distance(source, targetPos);
     }
 }

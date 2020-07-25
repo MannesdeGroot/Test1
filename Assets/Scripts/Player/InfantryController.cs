@@ -5,10 +5,11 @@ using UnityEngine;
 public class InfantryController : MonoBehaviour
 {
     [SerializeField] private InfantryStats stats;
+    private Animator anim;
 
     [Header("Look")]
     private Camera cam;
-    [SerializeField] private Transform head, eyes;
+    [SerializeField] private Transform body, head, eyes;
     [SerializeField] private float snapBackSpeed;
     [SerializeField] private float lookUpClamp, lookSideClamp;
     [SerializeField] private float normalFov, runFov;
@@ -19,20 +20,23 @@ public class InfantryController : MonoBehaviour
     [Space()]
     [SerializeField] private float recoilRotationSpeed;
     [SerializeField] private float recoilReturnSpeed;
-    [SerializeField] private Vector3 recoilRotationHipFire;
-    [SerializeField] private Vector3 recoilRotationAiming;
-    private Vector3 recoilRotAmplifier, recoilRot;
+    public Vector3 recoilRotationHipFire;
+    public Vector3 recoilRotationAiming;
+    private Vector3 shakeRotAmplifier, recoilRot;
 
     [Header("Weapons")]
     public Transform gunPos;
     public GameObject currentWeapon;
     private Weapon weapon;
     private float fireTimer;
+    [SerializeField] private float weaponRotationSpeed;
 
     private void Start()
     {
         cam = GetComponentInChildren<Camera>();
         weapon = currentWeapon.GetComponent<Weapon>();
+        currentWeapon.transform.SetParent(null);
+        //anim = GetComponent<Animator>();
     }
 
     private void Update()
@@ -40,9 +44,9 @@ public class InfantryController : MonoBehaviour
         Move();
         Fire();
         Look();
+        MoveWeapon();
         Aim();
         Reload();
-        RecoilRotation();
     }
 
     private void Move()
@@ -53,6 +57,8 @@ public class InfantryController : MonoBehaviour
         move.z = Input.GetAxis("Vertical");
 
         transform.Translate(move * Time.deltaTime * Speed());
+
+        //anim.SetFloat("Speed", move.x);
 
         if (Input.GetButton("Shift"))
         {
@@ -81,15 +87,15 @@ public class InfantryController : MonoBehaviour
             headRot.y += Input.GetAxis("Mouse X") * Time.deltaTime * Settings.sensitivity;
             headRot.y = Mathf.Clamp(headRot.y, bodyRot.y - lookSideClamp, bodyRot.y + lookSideClamp);
             head.rotation = Quaternion.Euler(headRot);
-            eyes.localRotation = Quaternion.Euler(eyeRot);
+            eyes.localRotation = Quaternion.Euler(eyeRot.x, headRot.y, 0);
         }
         else
         {
             bodyRot.y += Input.GetAxis("Mouse X") * Time.deltaTime * Settings.sensitivity;
-            transform.rotation = Quaternion.Euler(bodyRot);
-            if (head.rotation.y != transform.rotation.y)
+            body.rotation = Quaternion.Euler(bodyRot);
+            if (head.rotation.y != body.rotation.y)
             {
-                head.rotation = Quaternion.Lerp(head.rotation, transform.rotation, snapBackSpeed * Time.deltaTime);
+                head.rotation = Quaternion.Lerp(head.rotation, body.rotation, snapBackSpeed * Time.deltaTime);
             }
 
             if (freeLook)
@@ -97,7 +103,7 @@ public class InfantryController : MonoBehaviour
                 if (eyes.rotation != currentWeapon.transform.rotation)
                 {
                     eyeRot = Quaternion.Lerp(eyes.rotation, currentWeapon.transform.rotation, snapBackSpeed * Time.deltaTime).eulerAngles;
-                    eyes.rotation = Quaternion.Euler(eyeRot);
+                    eyes.rotation = Quaternion.Euler(eyeRot.x, headRot.y, 0);
                 }
                 else
                 {
@@ -107,11 +113,19 @@ public class InfantryController : MonoBehaviour
             }
             else
             {
-                currentWeapon.transform.position = gunPos.position;
-                currentWeapon.transform.rotation = gunPos.rotation;
                 eyes.localRotation = Quaternion.Euler(eyeRot);
             }
         }
+
+        shakeRotAmplifier = Vector3.Lerp(shakeRotAmplifier, eyeRot, recoilReturnSpeed * Time.deltaTime);
+        recoilRot = Vector3.Slerp(recoilRot, shakeRotAmplifier, recoilRotationSpeed * Time.deltaTime);
+        eyes.localRotation = Quaternion.Euler(eyeRot + shakeRotAmplifier);
+    }
+
+    private void MoveWeapon()
+    {
+        currentWeapon.transform.position = gunPos.position;
+        currentWeapon.transform.rotation = Quaternion.Slerp(currentWeapon.transform.rotation, gunPos.rotation, weaponRotationSpeed / weapon.weaponInfo.weight * Time.deltaTime);
     }
 
     private float Speed()
@@ -132,8 +146,8 @@ public class InfantryController : MonoBehaviour
         {
             if (Input.GetButtonDown("Fire1"))
             {
-                weapon.Fire();
-                Recoil();
+                // aiming?
+                weapon.Fire(this, recoilRotationHipFire);
                 fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
             }
         }
@@ -141,8 +155,8 @@ public class InfantryController : MonoBehaviour
         {
             if (Input.GetButton("Fire1"))
             {
-                weapon.Fire();
-                Recoil();
+                // aiming?
+                weapon.Fire(this, recoilRotationHipFire);
                 fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
             }
         }
@@ -159,17 +173,10 @@ public class InfantryController : MonoBehaviour
 
     }
 
-    private void RecoilRotation()
+    public void RecoilShake(Vector3 value)
     {
-        recoilRotAmplifier = Vector3.Lerp(recoilRotAmplifier, eyeRot, recoilReturnSpeed * Time.deltaTime);
-        recoilRot = Vector3.Slerp(recoilRot, recoilRotAmplifier, recoilRotationSpeed * Time.deltaTime);
-        eyes.localRotation = Quaternion.Euler(eyeRot + recoilRotAmplifier);
-    }
-
-    private void Recoil()
-    {
-        float recoilY = Random.Range(-recoilRotationHipFire.y, recoilRotationHipFire.y);
-        float recoilZ = Random.Range(-recoilRotationHipFire.z, recoilRotationHipFire.z);
-        recoilRotAmplifier += new Vector3(-recoilRotationHipFire.x, recoilY, recoilZ) * weapon.weaponInfo.recoilMultiplier;
+        float recoilY = Random.Range(-value.y, value.y);
+        float recoilZ = Random.Range(-value.z, value.z);
+        shakeRotAmplifier += new Vector3(value.x, recoilY, recoilZ);
     }
 }

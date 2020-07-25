@@ -19,7 +19,7 @@ public class Weapon : MonoBehaviour
         HUD.SetAmmoText(ammo, weaponInfo.clipSize);
     }
 
-    public void Fire()
+    public void Fire(InfantryController ic, Vector3 recoilValue)
     {
         if (ammo > 0 && !reloading)
         {
@@ -34,6 +34,7 @@ public class Weapon : MonoBehaviour
             projectile.GetComponent<Bullet>().startVelocity = weaponInfo.muzzleVelocity;
             ammo--;
             HUD.SetAmmoText(ammo, weaponInfo.clipSize);
+            ic.RecoilShake(recoilValue * weaponInfo.recoilMultiplier);
         }
     }
 

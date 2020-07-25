@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class ExplosiveInfo : ScriptableObject
 {
-    public float force;
+    public float blastForce;
+    public float shockForce;
     public float blastRadius;
+    public float shockRadius;
     public bool timed;
     public float time;
 }

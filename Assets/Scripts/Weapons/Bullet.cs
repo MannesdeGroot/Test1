@@ -19,6 +19,7 @@ public class Bullet : MonoBehaviour
     {
         bulletPath.Add(transform.position);
         rb = GetComponent<Rigidbody>();
+        rb.mass = caliber.mass;
     }
 
     private void Update()
@@ -91,9 +92,7 @@ public class Bullet : MonoBehaviour
             thickness = Vector3.Distance(transform.position, hit.point) * 100;
         }
 
-        float depth = initialDepth / Mathf.Pow(thickness, 2);
-        print($"{initialDepth} / {Mathf.Pow(thickness, 2)} = {depth}");
-        return depth;
+        return initialDepth / Mathf.Pow(thickness, 2);
     }
 
     private float CalculateVelocity()

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b17419f055f39fd4cb3dbd2502c37c70, type: 3}
   m_Name: HK416A5
   m_EditorClassIdentifier: 
+  weight: 3.85
   canToggle: 1
   fireMode: 1
   projectile: {fileID: 362959287928485307, guid: 44ed0c906152da449aa0c34ae8d09490,

@@ -17,6 +17,6 @@ public class HUD : MonoBehaviour
 
     public static void SetAmmoText(int ammo, int clipSize)
     {
-        ammoText.text = $"{ammo}/{clipSize}";
+        //ammoText.text = $"{ammo}/{clipSize}";
     }
 }

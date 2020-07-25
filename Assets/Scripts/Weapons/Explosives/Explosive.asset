@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 092ec95598ecc6946ad6dcd0a9d54504, type: 3}
   m_Name: Explosive
   m_EditorClassIdentifier: 
-  force: 950
+  blastForce: 950
+  shockForce: 5
   blastRadius: 3
+  shockRadius: 5
   timed: 0
   time: 0

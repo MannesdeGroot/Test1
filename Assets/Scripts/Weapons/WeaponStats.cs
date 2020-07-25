@@ -3,6 +3,8 @@
 [CreateAssetMenu(fileName = "Weapon", menuName = "Weapons/Weapon")]
 public class WeaponStats : ScriptableObject
 {
+    public float weight;
+
     [Header("Fire Mode")]
     public bool canToggle;
     public FireMode fireMode = FireMode.SEMI_AUTO;
