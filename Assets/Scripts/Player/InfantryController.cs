@@ -44,10 +44,32 @@ public class InfantryController : MonoBehaviour
     {
         Move();
         Fire();
-        Look();
         MoveWeapon();
+        Look();
         Aim();
         Reload();
+    }
+
+    private void LateUpdate()
+    {
+        if (freeLook)
+        {
+            if (eyes.rotation != currentWeapon.transform.rotation)
+            {
+                eyeRot = Quaternion.Lerp(eyes.rotation, currentWeapon.transform.rotation, snapBackSpeed * Time.deltaTime).eulerAngles;
+                eyes.rotation = Quaternion.Euler(eyeRot.x, headRot.y, 0);
+            }
+            else
+            {
+                verticalInput = 0;
+                freeLook = false;
+            }
+        }
+        else
+        {
+            spine.localRotation = Quaternion.Euler(eyeRot.x, headRot.y, 0);
+            eyes.rotation = head.rotation;
+        }
     }
 
     private void Move()
@@ -98,24 +120,6 @@ public class InfantryController : MonoBehaviour
             if (head.rotation.y != transform.rotation.y)
             {
                 head.rotation = Quaternion.Lerp(head.rotation, transform.rotation, snapBackSpeed * Time.deltaTime);
-            }
-
-            if (freeLook)
-            {
-                if (eyes.rotation != currentWeapon.transform.rotation)
-                {
-                    eyeRot = Quaternion.Lerp(eyes.rotation, currentWeapon.transform.rotation, snapBackSpeed * Time.deltaTime).eulerAngles;
-                    eyes.rotation = Quaternion.Euler(eyeRot.x, headRot.y, 0);
-                }
-                else
-                {
-                    verticalInput = 0;
-                    freeLook = false;
-                }
-            }
-            else
-            {
-                spine.localRotation = Quaternion.Euler(eyeRot.x, headRot.y, 0);
             }
         }
 
