@@ -9,7 +9,7 @@ public class InfantryController : MonoBehaviour
 
     [Header("Look")]
     private Camera cam;
-    [SerializeField] private Transform body, head, eyes;
+    [SerializeField] private Transform spine, head, eyes;
     [SerializeField] private float snapBackSpeed;
     [SerializeField] private float lookUpClamp, lookSideClamp;
     [SerializeField] private float normalFov, runFov;
@@ -17,6 +17,7 @@ public class InfantryController : MonoBehaviour
     public Vector3 eyeRot, headRot, bodyRot;
     public float verticalInput;
     public bool freeLook;
+    [Space()]
     [Space()]
     [SerializeField] private float recoilRotationSpeed;
     [SerializeField] private float recoilReturnSpeed;
@@ -35,8 +36,8 @@ public class InfantryController : MonoBehaviour
     {
         cam = GetComponentInChildren<Camera>();
         weapon = currentWeapon.GetComponent<Weapon>();
+        anim = GetComponentInChildren<Animator>();
         currentWeapon.transform.SetParent(null);
-        //anim = GetComponent<Animator>();
     }
 
     private void Update()
@@ -58,7 +59,8 @@ public class InfantryController : MonoBehaviour
 
         transform.Translate(move * Time.deltaTime * Speed());
 
-        //anim.SetFloat("Speed", move.x);
+        anim.SetFloat("Side", move.x * Speed());
+        anim.SetFloat("ForwardSpeed", move.z * Speed());
 
         if (Input.GetButton("Shift"))
         {
@@ -92,10 +94,10 @@ public class InfantryController : MonoBehaviour
         else
         {
             bodyRot.y += Input.GetAxis("Mouse X") * Time.deltaTime * Settings.sensitivity;
-            body.rotation = Quaternion.Euler(bodyRot);
-            if (head.rotation.y != body.rotation.y)
+            transform.rotation = Quaternion.Euler(bodyRot);
+            if (head.rotation.y != transform.rotation.y)
             {
-                head.rotation = Quaternion.Lerp(head.rotation, body.rotation, snapBackSpeed * Time.deltaTime);
+                head.rotation = Quaternion.Lerp(head.rotation, transform.rotation, snapBackSpeed * Time.deltaTime);
             }
 
             if (freeLook)
@@ -113,13 +115,13 @@ public class InfantryController : MonoBehaviour
             }
             else
             {
-                eyes.localRotation = Quaternion.Euler(eyeRot);
+                spine.localRotation = Quaternion.Euler(eyeRot.x, headRot.y, 0);
             }
         }
 
         shakeRotAmplifier = Vector3.Lerp(shakeRotAmplifier, eyeRot, recoilReturnSpeed * Time.deltaTime);
         recoilRot = Vector3.Slerp(recoilRot, shakeRotAmplifier, recoilRotationSpeed * Time.deltaTime);
-        eyes.localRotation = Quaternion.Euler(eyeRot + shakeRotAmplifier);
+        eyes.localRotation = Quaternion.Euler(eyes.rotation.eulerAngles + shakeRotAmplifier);
     }
 
     private void MoveWeapon()
@@ -140,24 +142,26 @@ public class InfantryController : MonoBehaviour
         if (Input.GetButtonDown("Fire3")) weapon.ToggleFireMode();
 
         fireTimer -= Time.deltaTime;
-        if (fireTimer > 0) return;
 
-        if (weapon.fireMode == FireMode.SEMI_AUTO)
+        if (fireTimer < 0)
         {
-            if (Input.GetButtonDown("Fire1"))
+            // aiming?
+
+            if (weapon.fireMode == FireMode.SEMI_AUTO)
             {
-                // aiming?
-                weapon.Fire(this, recoilRotationHipFire);
-                fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    weapon.Fire(this, recoilRotationHipFire); //Aim of Hip?
+                    fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
+                }
             }
-        }
-        else
-        {
-            if (Input.GetButton("Fire1"))
+            else
             {
-                // aiming?
-                weapon.Fire(this, recoilRotationHipFire);
-                fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
+                if (Input.GetButton("Fire1"))
+                {
+                    weapon.Fire(this, recoilRotationHipFire); //Aim of Hip?
+                    fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
+                }
             }
         }
     }
