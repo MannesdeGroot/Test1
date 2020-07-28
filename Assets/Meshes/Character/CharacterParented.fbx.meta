@@ -30,6 +30,9 @@ ModelImporter:
   - first:
       74: -5846229435575948841
     second: UCR|UCR_WALK-FORWARD
+  - first:
+      74: 661283938081252892
+    second: UCR|UCRAction
   externalObjects: {}
   materials:
     materialImportMode: 1
