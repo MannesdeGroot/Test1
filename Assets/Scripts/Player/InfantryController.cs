@@ -43,7 +43,7 @@ public class InfantryController : MonoBehaviour
     private void Update()
     {
         Move();
-        Fire();
+        //Fire();
         MoveWeapon();
         Look();
         Aim();
@@ -155,7 +155,7 @@ public class InfantryController : MonoBehaviour
             {
                 if (Input.GetButtonDown("Fire1"))
                 {
-                    weapon.Fire(this, recoilRotationHipFire); //Aim of Hip?
+                    //weapon.Fire(this, recoilRotationHipFire); //Aim of Hip?
                     fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
                 }
             }
@@ -163,7 +163,7 @@ public class InfantryController : MonoBehaviour
             {
                 if (Input.GetButton("Fire1"))
                 {
-                    weapon.Fire(this, recoilRotationHipFire); //Aim of Hip?
+                   // weapon.Fire(this, recoilRotationHipFire); //Aim of Hip?
                     fireTimer = 60 / weapon.weaponInfo.roundsPerMinute;
                 }
             }

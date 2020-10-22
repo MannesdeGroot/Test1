@@ -11,6 +11,7 @@ public class Weapon : MonoBehaviour
     [SerializeField] private Transform launchPosition;
     private int ammo;
     private bool reloading;
+    private float timer;
 
     private void Start()
     {
@@ -19,9 +20,14 @@ public class Weapon : MonoBehaviour
         HUD.SetAmmoText(ammo, weaponInfo.clipSize);
     }
 
-    public void Fire(InfantryController ic, Vector3 recoilValue)
+    void Update()
     {
-        if (ammo > 0 && !reloading)
+        timer -= Time.deltaTime;
+    }
+
+    public void Fire()
+    {
+        if (ammo > 0 && !reloading && timer < 0) 
         {
             GameObject flash = Instantiate(muzzleFlash, launchPosition.position, transform.rotation);
             AudioSource audioSource = flash.GetComponent<AudioSource>();
@@ -34,7 +40,8 @@ public class Weapon : MonoBehaviour
             projectile.GetComponent<Bullet>().startVelocity = weaponInfo.muzzleVelocity;
             ammo--;
             HUD.SetAmmoText(ammo, weaponInfo.clipSize);
-            ic.RecoilShake(recoilValue * weaponInfo.recoilMultiplier);
+
+            timer = 60 / weaponInfo.roundsPerMinute;
         }
     }
 
